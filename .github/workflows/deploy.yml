@@ -5,10 +5,16 @@ on:
     branches: [ "main" ]
   workflow_dispatch: {}
 
+env:
+  REGION: ${{ secrets.GCP_REGION }}
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  SERVICE: ${{ secrets.CLOUD_RUN_SERVICE }}
+  REPO: cloud-run-source-deploy
+  IMAGE: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cloud-run-source-deploy/${{ secrets.CLOUD_RUN_SERVICE }}:${{ github.sha }}
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
       id-token: write
@@ -17,7 +23,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Authenticate to Google Cloud using your JSON secret
       - name: Auth to GCP
         uses: google-github-actions/auth@v2
         with:
@@ -28,25 +33,26 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Build with Cloud Build
-        uses: google-github-actions/cloud-build@v1
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          substitutions: _IMAGE=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cloud-run-source-deploy/president-county-api
-          config: |
-            steps:
-            - name: 'gcr.io/cloud-builders/docker'
-              args: ['build','-t','$_IMAGE','-f','Dockerfile','.']
-            - name: 'gcr.io/cloud-builders/docker'
-              args: ['push','$_IMAGE']
-            images: ['$_IMAGE']
-      
+      - name: Ensure Artifact Registry repo exists
+        run: |
+          gcloud artifacts repositories describe "$REPO" --location="$REGION" || \
+          gcloud artifacts repositories create "$REPO" --repository-format=docker --location="$REGION"
+
+      - name: Configure Docker auth for Artifact Registry
+        run: gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+
+      # Build your container with Cloud Build (uses your Dockerfile)
+      # If you prefer Buildpacks and NO Dockerfile, see the note below.
+      - name: Build & push image
+        run: gcloud builds submit --tag "$IMAGE" .
+
       - name: Deploy to Cloud Run
+        id: deploy
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: ${{ secrets.CLOUD_RUN_SERVICE }}
-          region: ${{ secrets.GCP_REGION }}
-          image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cloud-run-source-deploy/president-county-api
+          service: ${{ env.SERVICE }}
+          region:  ${{ env.REGION }}
+          image:   ${{ env.IMAGE }}
           flags: --allow-unauthenticated --ingress=all --port=8080
 
       - name: Show URL
