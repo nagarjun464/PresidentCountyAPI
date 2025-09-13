@@ -28,20 +28,26 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      # Build & deploy in one step using Cloud Build + Cloud Run
-      # This action will use your Dockerfile to build the image.
+      - name: Build with Cloud Build
+        uses: google-github-actions/cloud-build@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          substitutions: _IMAGE=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cloud-run-source-deploy/president-county-api
+          config: |
+            steps:
+            - name: 'gcr.io/cloud-builders/docker'
+              args: ['build','-t','$_IMAGE','-f','Dockerfile','.']
+            - name: 'gcr.io/cloud-builders/docker'
+              args: ['push','$_IMAGE']
+            images: ['$_IMAGE']
+      
       - name: Deploy to Cloud Run
-        id: deploy
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ secrets.CLOUD_RUN_SERVICE }}
-          region:  ${{ secrets.GCP_REGION }}
-          source:  .                # build from repo root using Dockerfile
-          # Optional: set min/max instances, env vars, concurrency, etc.
-          flags: >
-            --allow-unauthenticated
-            --ingress=all
-            --port=8080
+          region: ${{ secrets.GCP_REGION }}
+          image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cloud-run-source-deploy/president-county-api
+          flags: --allow-unauthenticated --ingress=all --port=8080
 
       - name: Show URL
         run: echo "Service URL = ${{ steps.deploy.outputs.url }}"
