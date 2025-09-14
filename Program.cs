@@ -1,7 +1,15 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Force Kestrel to bind to Cloud Run's PORT (default 8080)
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
+// Keep logs visible in Cloud Run
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+
+// Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
