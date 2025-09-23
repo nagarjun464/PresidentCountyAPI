@@ -13,7 +13,7 @@ env:
   IMAGE:      ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cloud-run-source-deploy/${{ secrets.CLOUD_RUN_SERVICE }}:${{ github.sha }}
 
 jobs:
-  build-and-deploy: 
+  build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
