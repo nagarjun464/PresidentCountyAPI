@@ -15,8 +15,9 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+//var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+//builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 
 // ---------- Firestore Setup ----------
 var projectId = builder.Configuration["GoogleCloud:ProjectId"]
@@ -33,7 +34,10 @@ builder.Services.AddSingleton(_ => FirestoreDb.Create(projectId));
 // ---------- Add Controllers ----------
 builder.Services.AddControllers();
 
+
 var app = builder.Build();
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Urls.Add($"http://0.0.0.0:{port}");
 
 // ---------- Middleware ----------
 if (app.Environment.IsDevelopment() || true)  // allow in production too
