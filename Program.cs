@@ -15,6 +15,9 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 // ---------- Firestore Setup ----------
 var projectId = builder.Configuration["GoogleCloud:ProjectId"]
     ?? throw new InvalidOperationException("Missing GoogleCloud:ProjectId in appsettings.json");
