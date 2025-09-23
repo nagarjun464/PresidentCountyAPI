@@ -54,3 +54,6 @@ jobs:
             --region "$REGION" \
             --platform managed \
             --allow-unauthenticated
+            --timeout=600s
+            --set-env-vars "GOOGLE_APPLICATION_CREDENTIALS=/secrets/key.json" \
+            --update-secrets "/secrets/key.json=projects/my-gcp-project/secrets/my-sa-key:latest"
