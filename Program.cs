@@ -36,18 +36,18 @@ builder.Services.AddControllers();
 var app = builder.Build();
 
 // ---------- Middleware ----------
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || true)  // allow in production too
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "PresidentCounty API v1");
-        c.RoutePrefix = "swagger";
+        c.RoutePrefix = string.Empty; // ? Serve Swagger at "/"
     });
 }
-
 app.UseHttpsRedirection();
 app.UseAuthorization();
+
 
 app.MapControllers();
 
