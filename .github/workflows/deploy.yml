@@ -54,4 +54,4 @@ jobs:
             --region "$REGION" \
             --platform managed \
             --allow-unauthenticated \
-            --timeout=600s 
+            --update-secrets GOOGLE_APPLICATION_CREDENTIALS=credentials_json:latest
