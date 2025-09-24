@@ -17,7 +17,12 @@ public class PresidentCountyController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll() => Ok(await _service.GetAllAsync());
+    public async Task<IActionResult> GetAll(int page = 1, int pageSize = 50)
+    {
+        var results = await _service.GetPagedAsync(page, pageSize);
+        return Ok(results);
+    }
+
 
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(string id)

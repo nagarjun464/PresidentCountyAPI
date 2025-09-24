@@ -1,6 +1,8 @@
 ﻿namespace PresidentCountyAPI.Services;
 using Google.Cloud.Firestore;
+using Google.Cloud.Firestore.V1;
 using PresidentCountyAPI.Models;
+using static Google.Cloud.Firestore.V1.StructuredQuery.Types;
 
 public class PresidentCountyService
 {
@@ -12,6 +14,22 @@ public class PresidentCountyService
         Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", credentialsPath);
         _db = FirestoreDb.Create(projectId);
     }
+
+    public async Task<List<PresidentCountyCandidate>> GetPagedAsync(int page, int pageSize)
+    {
+        var collection = _db.Collection("PresidentCountyCandidates")
+            .OrderByDescending("total_votes");
+
+        var snapshot = await collection
+            .Offset((page - 1) * pageSize)
+            .Limit(pageSize)
+            .GetSnapshotAsync();
+
+        return snapshot.Documents
+            .Select(d => d.ConvertTo<PresidentCountyCandidate>())
+            .ToList();
+    }
+
 
     public async Task<List<PresidentCountyCandidate>> GetAllAsync()
     {

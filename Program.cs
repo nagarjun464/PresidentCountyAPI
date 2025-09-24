@@ -30,6 +30,17 @@ builder.Services.AddSingleton(_ => FirestoreDb.Create(projectId));
 // ---------- Add Controllers ----------
 builder.Services.AddControllers();
 
+// Enable CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()      // allow all origins (for dev; restrict later if needed)
+              .AllowAnyMethod()      // GET, POST, PUT, DELETE
+              .AllowAnyHeader();     // all headers
+    });
+});
+
 
 var app = builder.Build();
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";

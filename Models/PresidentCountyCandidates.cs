@@ -5,21 +5,21 @@ using Google.Cloud.Firestore;
 public class PresidentCountyCandidate
 {
     [FirestoreProperty("state")]
-    public string State { get; set; }
+    public string? State { get; set; }
 
     [FirestoreProperty("county")]
-    public string County { get; set; }
+    public string? County { get; set; }
 
     [FirestoreProperty("candidate")]
-    public string CandidateName { get; set; }
+    public string? CandidateName { get; set; }
 
     [FirestoreProperty("party")]
-    public string Party { get; set; }
+    public string? Party { get; set; }
 
     [FirestoreProperty("total_votes")]
-    public string TotalVotes { get; set; }
+    public string? TotalVotes { get; set; }
 
     [FirestoreProperty("won")]
-    public string Won { get; set; }
+    public string? Won { get; set; }
 }
 
