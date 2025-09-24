@@ -20,6 +20,6 @@ public class PresidentCountyCandidate
     public string? TotalVotes { get; set; }
 
     [FirestoreProperty("won")]
-    public string? Won { get; set; }
+    public bool Won { get; set; }
 }
 
