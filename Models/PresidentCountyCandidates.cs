@@ -4,6 +4,9 @@ using Google.Cloud.Firestore;
 [FirestoreData]
 public class PresidentCountyCandidate
 {
+    [FirestoreDocumentId]
+    public string Id { get; set; } = string.Empty;
+
     [FirestoreProperty("state")]
     public string? State { get; set; }
 
