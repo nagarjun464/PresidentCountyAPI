@@ -15,20 +15,24 @@ public class PresidentCountyService
         _db = FirestoreDb.Create(projectId);
     }
 
-    public async Task<List<PresidentCountyCandidate>> GetPagedAsync(int page, int pageSize)
+    public async Task<List<PresidentCountyCandidate>> GetPagedAsync(int page, int pageSize, string? search = null)
     {
-        var collection = _db.Collection("PresidentCountyCandidates")
-            .OrderByDescending("total_votes");
+        var all = await GetAllAsync();
 
-        var snapshot = await collection
-            .Offset((page - 1) * pageSize)
-            .Limit(pageSize)
-            .GetSnapshotAsync();
-
-        return snapshot.Documents
-            .Select(d => d.ConvertTo<PresidentCountyCandidate>())
-            .ToList();
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            search = search.Trim().ToLower();
+            all = all.Where(c =>
+                (!string.IsNullOrEmpty(c.CandidateName) && c.CandidateName.ToLower().Contains(search)) ||
+                (!string.IsNullOrEmpty(c.County) && c.County.ToLower().Contains(search)) ||
+                (!string.IsNullOrEmpty(c.State) && c.State.ToLower().Contains(search)) ||
+                (!string.IsNullOrEmpty(c.Party) && c.Party.ToLower().Contains(search))
+            ).ToList();
+        }
+        Console.WriteLine($"Search term: {search}, Total records after filter: {all.Count}");
+        return all.Skip((page - 1) * pageSize).Take(pageSize).ToList();
     }
+
 
 
     public async Task<List<PresidentCountyCandidate>> GetAllAsync()
