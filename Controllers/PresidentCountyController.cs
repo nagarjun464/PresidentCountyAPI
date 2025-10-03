@@ -8,12 +8,15 @@ namespace PresidentCountyAPI.Controllers;
 public class PresidentCountyController : ControllerBase
 {
     private readonly PresidentCountyService _service;
+    private readonly ReportService _reportService;
+
 
     public PresidentCountyController(IConfiguration config)
     {
         var projectId = config["GoogleCloud:ProjectId"];
         var credentialsPath = config["GoogleCloud:CredentialsPath"];
         _service = new PresidentCountyService(projectId, credentialsPath);
+        _reportService = new ReportService();
     }
 
     [HttpGet]
@@ -53,4 +56,21 @@ public class PresidentCountyController : ControllerBase
         await _service.DeleteAsync(id);
         return NoContent();
     }
+
+    [HttpGet("export/excel")]
+    public async Task<IActionResult> ExportExcel(string? search = null)
+    {
+        var list = await _service.GetAllFiltered(search);
+        var bytes = _reportService.ExportPresidentCountyToExcel(list);
+        return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PresidentCountyReport.xlsx");
+    }
+
+    [HttpGet("export/pdf")]
+    public async Task<IActionResult> ExportPdf(string? search = null)
+    {
+        var list = await _service.GetAllFiltered(search);
+        var bytes = _reportService.ExportPresidentCountyToPdf(list);
+        return File(bytes, "application/pdf", "PresidentCountyReport.pdf");
+    }
+
 }

@@ -62,4 +62,21 @@ public class PresidentCountyService
     {
         await _db.Collection(_collection).Document(id).DeleteAsync();
     }
+
+    public async Task<List<PresidentCountyCandidate>> GetAllFiltered(string? search)
+    {
+        var snapshot = await _db.Collection(_collection).GetSnapshotAsync();
+        var all = snapshot.Documents.Select(d => d.ConvertTo<PresidentCountyCandidate>()).ToList();
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            all = all.Where(c =>
+                (c.CandidateName?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (c.State?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (c.County?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false)
+            ).ToList();
+        }
+
+        return all;
+    }
 }
