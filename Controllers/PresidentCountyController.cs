@@ -62,15 +62,26 @@ public class PresidentCountyController : ControllerBase
     {
         var list = await _service.GetAllFiltered(search);
         var bytes = _reportService.ExportPresidentCountyToExcel(list);
-        return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PresidentCountyReport.xlsx");
+        return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"PresidentCountyReport_{search}.xlsx");
     }
 
     [HttpGet("export/pdf")]
     public async Task<IActionResult> ExportPdf(string? search = null)
     {
-        var list = await _service.GetAllFiltered(search);
-        var bytes = _reportService.ExportPresidentCountyToPdf(list);
-        return File(bytes, "application/pdf", "PresidentCountyReport.pdf");
-    }
+        try
+        {
+            var list = await _service.GetAllFiltered(search);
+            if (list == null || !list.Any())
+                return BadRequest("No data available to export.");
 
-}
+            var bytes = _reportService.ExportPresidentCountyToPdf(list);
+            return File(bytes, "application/pdf", "PresidentCountyReport.pdf");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"PDF Export Error: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            return StatusCode(500, $"PDF export failed: {ex.Message}");
+        }
+
+    }
