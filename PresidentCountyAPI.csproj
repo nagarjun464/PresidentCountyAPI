@@ -7,14 +7,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Fonts\DejaVuSans-Bold.ttf" />
+    <None Remove="Fonts\DejaVuSans.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Fonts\DejaVuSans-Bold.ttf" />
+    <EmbeddedResource Include="Fonts\DejaVuSans.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="CsvHelper" Version="33.1.0" />
     <PackageReference Include="Google.Cloud.Firestore" Version="3.10.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
+    <PackageReference Include="PDFsharp" Version="6.2.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.4" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.9" />
   </ItemGroup>
 
 </Project>
