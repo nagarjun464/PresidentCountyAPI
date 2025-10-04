@@ -75,7 +75,7 @@ public class PresidentCountyController : ControllerBase
                 return BadRequest("No data available to export.");
 
             var bytes = _reportService.ExportPresidentCountyToPdf(list);
-            return File(bytes, "application/pdf", "PresidentCountyReport.pdf");
+            return File(bytes, "application/pdf", $"PresidentCountyReport_{search}.pdf");
         }
         catch (Exception ex)
         {
